@@ -1,0 +1,41 @@
+{
+  "automato 1": {
+    "alfabeto": ["a", "b"],
+    "estados": ["Q0", "Q1", "Q2"],
+    "estados-finais": ["Q2"],
+    "estados-iniciais": ["Q0"],
+    "transicoes": [
+      ["Q0", "Q1", "a"],
+      ["Q0", "Q0", "b"],
+      ["Q1", "Q2", "b"],
+      ["Q2", "Q1", "a"]
+    ]
+  },
+  "automato 2": {
+    "alfabeto": ["a", "b"],
+    "estados": ["Q0", "Q1", "Q2"],
+    "estados-finais": ["Q2"],
+    "estados-iniciais": ["Q0", "Q1"],
+    "transicoes": [
+      ["Q0", "Q2", "a"],
+      ["Q1", "Q1", "b"],
+      ["Q1", "Q2", "a"],
+      ["Q2", "Q1", "b"]
+    ]
+  },
+  "automato 3": {
+    "alfabeto": ["a"],
+    "estados": ["Q0", "Q1", "Q2"],
+    "estados-finais": ["Q2"],
+    "estados-iniciais": ["Q0"],
+    "transicoes": [
+      ["Q0", "Q1", "&"],
+      ["Q1", "Q2", "a"],
+      ["Q2", "Q0", "&"]
+    ]
+  },
+  "palavra-teste": {
+    "aceita": ["abab", "ab"],
+    "rejeita": ["abb", "bbb"]
+  }
+}

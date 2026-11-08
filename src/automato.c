@@ -140,13 +140,24 @@ int ler_automato(Automato *a) {
     return ler_transicoes(a);
 }
 
-static void imprimir_conjunto(const bool *marcados, int qtd_estados) {
+static void imprimir_nome(const Automato *a, int estado) {
+    if (a->nomes[estado][0] == '\0') {
+        printf("q%d", estado);
+    } else {
+        printf("%s", a->nomes[estado]);
+    }
+}
+
+static void imprimir_conjunto(const Automato *a, const bool *marcados) {
     bool primeiro = true;
 
     printf("{");
-    for (int i = 0; i < qtd_estados; i++) {
+    for (int i = 0; i < a->qtd_estados; i++) {
         if (marcados[i]) {
-            printf("%sq%d", primeiro ? "" : ", ", i);
+            if (!primeiro) {
+                printf(", ");
+            }
+            imprimir_nome(a, i);
             primeiro = false;
         }
     }
@@ -154,10 +165,8 @@ static void imprimir_conjunto(const bool *marcados, int qtd_estados) {
 }
 
 static void imprimir_nome_estado(const Automato *a, int estado) {
-    printf("%s%sq%d",
-           a->eh_inicial[estado] ? "->" : "",
-           a->eh_final[estado] ? "*" : "",
-           estado);
+    printf("%s%s", a->eh_inicial[estado] ? "->" : "", a->eh_final[estado] ? "*" : "");
+    imprimir_nome(a, estado);
 }
 
 void imprimir_automato(const Automato *a) {
@@ -165,7 +174,10 @@ void imprimir_automato(const Automato *a) {
 
     printf("Estados  : {");
     for (int i = 0; i < a->qtd_estados; i++) {
-        printf("%sq%d", i > 0 ? ", " : "", i);
+        if (i > 0) {
+            printf(", ");
+        }
+        imprimir_nome(a, i);
     }
     printf("}\n");
 
@@ -176,11 +188,11 @@ void imprimir_automato(const Automato *a) {
     printf("}\n");
 
     printf("Iniciais : ");
-    imprimir_conjunto(a->eh_inicial, a->qtd_estados);
+    imprimir_conjunto(a, a->eh_inicial);
     printf("\n");
 
     printf("Finais   : ");
-    imprimir_conjunto(a->eh_final, a->qtd_estados);
+    imprimir_conjunto(a, a->eh_final);
     printf("\n");
 
     printf("\nTabela de transicoes (->inicial, *final):\n");
@@ -194,10 +206,10 @@ void imprimir_automato(const Automato *a) {
         imprimir_nome_estado(a, i);
         for (int s = 0; s < a->qtd_simbolos; s++) {
             printf(" | ");
-            imprimir_conjunto(a->transicao[i][s], a->qtd_estados);
+            imprimir_conjunto(a, a->transicao[i][s]);
         }
         printf(" | ");
-        imprimir_conjunto(a->transicao_lambda[i], a->qtd_estados);
+        imprimir_conjunto(a, a->transicao_lambda[i]);
         printf("\n");
     }
     printf("====================\n");

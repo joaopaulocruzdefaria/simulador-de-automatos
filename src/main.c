@@ -3,16 +3,21 @@
 #include "automato.h"
 #include "conversao_lambda.h"
 #include "aceitacao.h"
+#include "json_automato.h"
 
 #define TAMANHO_PALAVRA 256
+#define TAMANHO_CAMINHO 256
 
 static Automato atual;
 static Automato resultado;
+static PalavrasTeste palavras_teste;
 static bool carregado = false;
+static char caminho_arquivo[TAMANHO_CAMINHO];
+static char nome_automato[TAMANHO_TEXTO];
 
 static void mostrar_menu(void) {
     printf("\n===== SIMULADOR DE AUTOMATOS =====\n");
-    printf("1  - Ler automato\n");
+    printf("1  - Carregar automato de arquivo JSON\n");
     printf("2  - Imprimir automato\n");
     printf("3  - Multiplos iniciais para AFN-lambda\n");
     printf("4  - AFN-lambda para AFN\n");
@@ -23,6 +28,8 @@ static void mostrar_menu(void) {
     printf("9  - Intersecao de AFDs\n");
     printf("10 - Subtracao de AFDs\n");
     printf("11 - Complemento de AFD\n");
+    printf("12 - Ler automato pelo teclado\n");
+    printf("13 - Executar palavras-teste do arquivo JSON\n");
     printf("0  - Sair\n");
 }
 
@@ -44,7 +51,7 @@ static int ler_opcao(void) {
 
 static bool exigir_automato(void) {
     if (!carregado) {
-        printf("Erro: leia um automato primeiro (opcao 1).\n");
+        printf("Erro: carregue um automato primeiro (opcao 1 ou 12).\n");
     }
     return carregado;
 }
@@ -53,7 +60,24 @@ static void opcao_nao_integrada(const char *nome) {
     printf("%s ainda nao foi integrado ao menu.\n", nome);
 }
 
+static void opcao_carregar_json(void) {
+    printf("Caminho do arquivo JSON: ");
+    if (scanf(" %255[^\n]", caminho_arquivo) != 1) {
+        return;
+    }
+    printf("Nome do automato (ex: automato 1): ");
+    if (scanf(" %63[^\n]", nome_automato) != 1) {
+        return;
+    }
+    carregado = carregar_automato_json(caminho_arquivo, nome_automato, &atual);
+    if (carregado) {
+        printf("Automato '%s' carregado com sucesso.\n", nome_automato);
+        imprimir_automato(&atual);
+    }
+}
+
 static void opcao_ler(void) {
+    caminho_arquivo[0] = '\0';
     carregado = ler_automato(&atual) == 1;
     if (carregado) {
         printf("Automato lido com sucesso.\n");
@@ -107,6 +131,33 @@ static void opcao_testar_palavra(void) {
     }
 }
 
+static void executar_lista(const ListaTextos *palavras, bool esperado) {
+    for (int i = 0; i < palavras->quantidade; i++) {
+        bool aceita = testar_palavra(&atual, palavras->itens[i]);
+
+        printf("  \"%s\" -> %s (%s)\n", palavras->itens[i],
+               aceita ? "ACEITA" : "REJEITADA",
+               aceita == esperado ? "ok" : "ERRO");
+    }
+}
+
+static void opcao_palavras_teste(void) {
+    if (!exigir_automato()) {
+        return;
+    }
+    if (caminho_arquivo[0] == '\0') {
+        printf("Erro: o automato atual nao veio de um arquivo JSON (use a opcao 1).\n");
+        return;
+    }
+    if (!carregar_palavras_teste(caminho_arquivo, &palavras_teste)) {
+        return;
+    }
+    printf("Palavras que deveriam ser aceitas:\n");
+    executar_lista(&palavras_teste.aceitas, true);
+    printf("Palavras que deveriam ser rejeitadas:\n");
+    executar_lista(&palavras_teste.rejeitadas, false);
+}
+
 int main(void) {
     int opcao;
 
@@ -116,7 +167,7 @@ int main(void) {
 
         switch (opcao) {
             case 0:  printf("Encerrando.\n"); break;
-            case 1:  opcao_ler(); break;
+            case 1:  opcao_carregar_json(); break;
             case 2:  opcao_imprimir(); break;
             case 3:  opcao_multiplos_iniciais(); break;
             case 4:  opcao_remover_lambda(); break;
@@ -127,6 +178,8 @@ int main(void) {
             case 9:  opcao_nao_integrada("Intersecao de AFDs"); break;
             case 10: opcao_nao_integrada("Subtracao de AFDs"); break;
             case 11: opcao_nao_integrada("Complemento de AFD"); break;
+            case 12: opcao_ler(); break;
+            case 13: opcao_palavras_teste(); break;
             default: printf("Opcao invalida.\n"); break;
         }
     } while (opcao != 0);

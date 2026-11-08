@@ -18,6 +18,7 @@ int converter_multiplos_iniciais_para_lambda(const Automato *origem, Automato *d
         }
     }
     destino->eh_inicial[estado_novo] = true;
+    strcpy(destino->nomes[estado_novo], "q_novo");
     return 1;
 }
 
@@ -72,6 +73,7 @@ void remover_transicoes_lambda(const Automato *origem, Automato *destino) {
     destino->qtd_estados = origem->qtd_estados;
     destino->qtd_simbolos = origem->qtd_simbolos;
     memcpy(destino->alfabeto, origem->alfabeto, sizeof(origem->alfabeto));
+    memcpy(destino->nomes, origem->nomes, sizeof(origem->nomes));
     memcpy(destino->eh_inicial, origem->eh_inicial, sizeof(origem->eh_inicial));
 
     calcular_todos_fechos(origem, fechos);

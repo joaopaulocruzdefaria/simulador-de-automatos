@@ -3,13 +3,15 @@
 
 #include <stdbool.h>
 
-#define MAX_ESTADOS  64
-#define MAX_SIMBOLOS 26
+#define MAX_ESTADOS   64
+#define MAX_SIMBOLOS  26
+#define TAMANHO_NOME  64
 
 typedef struct {
     int  qtd_estados;
     int  qtd_simbolos;
     char alfabeto[MAX_SIMBOLOS];
+    char nomes[MAX_ESTADOS][TAMANHO_NOME];
     bool eh_inicial[MAX_ESTADOS];
     bool eh_final[MAX_ESTADOS];
     bool transicao[MAX_ESTADOS][MAX_SIMBOLOS][MAX_ESTADOS];
