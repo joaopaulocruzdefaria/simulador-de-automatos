@@ -2,6 +2,7 @@
 #include <string.h>
 #include "automato.h"
 #include "conversao_lambda.h"
+#include "conversao_afd.h"
 #include "aceitacao.h"
 #include "json_automato.h"
 
@@ -111,6 +112,18 @@ static void opcao_remover_lambda(void) {
     imprimir_automato(&atual);
 }
 
+static void opcao_converter_afd(void) {
+    if (!exigir_automato()) {
+        return;
+    }
+    if (!converter_afn_para_afd(&atual, &resultado)) {
+        printf("Erro: limite de estados atingido na conversao para AFD.\n");
+        return;
+    }
+    atual = resultado;
+    imprimir_automato(&atual);
+}
+
 static void opcao_testar_palavra(void) {
     char palavra[TAMANHO_PALAVRA];
 
@@ -172,7 +185,7 @@ int main(void) {
             case 3:  opcao_multiplos_iniciais(); break;
             case 4:  opcao_remover_lambda(); break;
             case 5:  opcao_testar_palavra(); break;
-            case 6:  opcao_nao_integrada("AFN para AFD"); break;
+            case 6:  opcao_converter_afd(); break;
             case 7:  opcao_nao_integrada("Minimizacao de AFD"); break;
             case 8:  opcao_nao_integrada("Uniao de AFDs"); break;
             case 9:  opcao_nao_integrada("Intersecao de AFDs"); break;
