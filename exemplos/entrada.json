@@ -1,4 +1,18 @@
 {
+  "afn": {
+    "alfabeto": ["a", "b"],
+    "estados": ["q0", "q1", "q2"],
+    "estados-iniciais": ["q0"],
+    "estados-finais": ["q2"],
+    "transicoes": [
+      ["q0", "q0", "a"],
+      ["q0", "q0", "b"],
+      ["q0", "q1", "a"],
+      ["q1", "q2", "a"],
+      ["q2", "q2", "a"],
+      ["q2", "q2", "b"]
+    ]
+  },
   "automato 1": {
     "alfabeto": ["a", "b"],
     "estados": ["Q0", "Q1", "Q2"],
@@ -7,8 +21,9 @@
     "transicoes": [
       ["Q0", "Q1", "a"],
       ["Q0", "Q0", "b"],
+      ["Q0", "Q1", "a"],
       ["Q1", "Q2", "b"],
-      ["Q2", "Q1", "a"]
+      ["Q1", "Q2", "&"]
     ]
   },
   "automato 2": {
