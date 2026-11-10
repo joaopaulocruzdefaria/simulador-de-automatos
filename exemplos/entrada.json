@@ -48,9 +48,5 @@
       ["Q1", "Q2", "a"],
       ["Q2", "Q0", "&"]
     ]
-  },
-  "palavra-teste": {
-    "aceita": ["abab", "ab"],
-    "rejeita": ["abb", "bbb"]
   }
 }
