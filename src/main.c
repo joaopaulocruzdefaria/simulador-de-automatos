@@ -2,23 +2,22 @@
 #include <string.h>
 #include "automato.h"
 #include "conversao_lambda.h"
-#include "conversao_afd.h"
 #include "aceitacao.h"
 #include "json_automato.h"
 
 #define TAMANHO_PALAVRA 256
-#define TAMANHO_CAMINHO 256
+#define CAMINHO_JSON    "exemplos/entrada.json"
 
 static Automato atual;
 static Automato resultado;
 static PalavrasTeste palavras_teste;
 static bool carregado = false;
-static char caminho_arquivo[TAMANHO_CAMINHO];
+static bool veio_do_json = false;
 static char nome_automato[TAMANHO_TEXTO];
 
 static void mostrar_menu(void) {
     printf("\n===== SIMULADOR DE AUTOMATOS =====\n");
-    printf("1  - Carregar automato de arquivo JSON\n");
+    printf("1  - Carregar automato do arquivo JSON\n");
     printf("2  - Imprimir automato\n");
     printf("3  - Multiplos iniciais para AFN-lambda\n");
     printf("4  - AFN-lambda para AFN\n");
@@ -62,15 +61,12 @@ static void opcao_nao_integrada(const char *nome) {
 }
 
 static void opcao_carregar_json(void) {
-    printf("Caminho do arquivo JSON: ");
-    if (scanf(" %255[^\n]", caminho_arquivo) != 1) {
-        return;
-    }
     printf("Nome do automato (ex: automato 1): ");
     if (scanf(" %63[^\n]", nome_automato) != 1) {
         return;
     }
-    carregado = carregar_automato_json(caminho_arquivo, nome_automato, &atual);
+    carregado = carregar_automato_json(CAMINHO_JSON, nome_automato, &atual);
+    veio_do_json = carregado;
     if (carregado) {
         printf("Automato '%s' carregado com sucesso.\n", nome_automato);
         imprimir_automato(&atual);
@@ -78,7 +74,7 @@ static void opcao_carregar_json(void) {
 }
 
 static void opcao_ler(void) {
-    caminho_arquivo[0] = '\0';
+    veio_do_json = false;
     carregado = ler_automato(&atual) == 1;
     if (carregado) {
         printf("Automato lido com sucesso.\n");
@@ -108,18 +104,6 @@ static void opcao_remover_lambda(void) {
         return;
     }
     remover_transicoes_lambda(&atual, &resultado);
-    atual = resultado;
-    imprimir_automato(&atual);
-}
-
-static void opcao_converter_afd(void) {
-    if (!exigir_automato()) {
-        return;
-    }
-    if (!converter_afn_para_afd(&atual, &resultado)) {
-        printf("Erro: limite de estados atingido na conversao para AFD.\n");
-        return;
-    }
     atual = resultado;
     imprimir_automato(&atual);
 }
@@ -158,11 +142,11 @@ static void opcao_palavras_teste(void) {
     if (!exigir_automato()) {
         return;
     }
-    if (caminho_arquivo[0] == '\0') {
-        printf("Erro: o automato atual nao veio de um arquivo JSON (use a opcao 1).\n");
+    if (!veio_do_json) {
+        printf("Erro: o automato atual nao veio do arquivo JSON (use a opcao 1).\n");
         return;
     }
-    if (!carregar_palavras_teste(caminho_arquivo, &palavras_teste)) {
+    if (!carregar_palavras_teste(CAMINHO_JSON, &palavras_teste)) {
         return;
     }
     printf("Palavras que deveriam ser aceitas:\n");
@@ -185,7 +169,7 @@ int main(void) {
             case 3:  opcao_multiplos_iniciais(); break;
             case 4:  opcao_remover_lambda(); break;
             case 5:  opcao_testar_palavra(); break;
-            case 6:  opcao_converter_afd(); break;
+            case 6:  opcao_nao_integrada("AFN para AFD"); break;
             case 7:  opcao_nao_integrada("Minimizacao de AFD"); break;
             case 8:  opcao_nao_integrada("Uniao de AFDs"); break;
             case 9:  opcao_nao_integrada("Intersecao de AFDs"); break;
